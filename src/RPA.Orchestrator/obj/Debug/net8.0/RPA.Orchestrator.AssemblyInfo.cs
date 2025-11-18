@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RPA.Orchestrator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0763f30a32443db53df7bdfe52b5968dedfec28")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4d9367f13bf9b40a8ed191e7aba668f92309bf6")]
 [assembly: System.Reflection.AssemblyProductAttribute("RPA.Orchestrator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RPA.Orchestrator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

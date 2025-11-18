@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "7mZMcyLkjeo=",
+  "dgSpecHash": "JDyLBIRpKNo=",
   "success": true,
   "projectFilePath": "/home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.Orchestrator/RPA.Orchestrator.csproj",
   "expectedPackageFiles": [
@@ -31,7 +31,15 @@
     "/home/martinwlsngrgv/.nuget/packages/microsoft.extensions.options/8.0.2/microsoft.extensions.options.8.0.2.nupkg.sha512",
     "/home/martinwlsngrgv/.nuget/packages/microsoft.extensions.options.configurationextensions/8.0.0/microsoft.extensions.options.configurationextensions.8.0.0.nupkg.sha512",
     "/home/martinwlsngrgv/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.codedom/8.0.0/system.codedom.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.configuration.configurationmanager/8.0.0/system.configuration.configurationmanager.8.0.0.nupkg.sha512",
     "/home/martinwlsngrgv/.nuget/packages/system.diagnostics.eventlog/8.0.1/system.diagnostics.eventlog.8.0.1.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.directoryservices/8.0.0/system.directoryservices.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.directoryservices.accountmanagement/8.0.0/system.directoryservices.accountmanagement.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.directoryservices.protocols/8.0.0/system.directoryservices.protocols.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.management/8.0.0/system.management.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.security.cryptography.protecteddata/8.0.0/system.security.cryptography.protecteddata.8.0.0.nupkg.sha512",
+    "/home/martinwlsngrgv/.nuget/packages/system.serviceprocess.servicecontroller/8.0.0/system.serviceprocess.servicecontroller.8.0.0.nupkg.sha512",
     "/home/martinwlsngrgv/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.20/microsoft.aspnetcore.app.ref.8.0.20.nupkg.sha512",
     "/home/martinwlsngrgv/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.20/microsoft.netcore.app.host.linux-x64.8.0.20.nupkg.sha512"
   ],

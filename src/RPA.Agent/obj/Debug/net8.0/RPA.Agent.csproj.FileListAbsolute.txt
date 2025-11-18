@@ -46,3 +46,5 @@
 /home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.Agent/obj/Debug/net8.0/RPA.Agent.pdb
 /home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.Agent/obj/Debug/net8.0/RPA.Agent.genruntimeconfig.cache
 /home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.Agent/obj/Debug/net8.0/ref/RPA.Agent.dll
+/home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.Agent/obj/Debug/net8.0/RPA.Agent.MvcApplicationPartsAssemblyInfo.cache
+/home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.Agent/obj/Debug/net8.0/RPA.Agent.sourcelink.json

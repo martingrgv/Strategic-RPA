@@ -12,18 +12,18 @@ public class TemplatesController : ControllerBase
 {
     private readonly IAutomationTemplateService _templateService;
     private readonly IJobService _jobService;
-    private readonly IAgentService _agentService;
+    private readonly IMessageQueueService _messageQueueService;
     private readonly ILogger<TemplatesController> _logger;
 
     public TemplatesController(
         IAutomationTemplateService templateService,
         IJobService jobService,
-        IAgentService agentService,
+        IMessageQueueService messageQueueService,
         ILogger<TemplatesController> logger)
     {
         _templateService = templateService;
         _jobService = jobService;
-        _agentService = agentService;
+        _messageQueueService = messageQueueService;
         _logger = logger;
     }
 
@@ -95,14 +95,10 @@ public class TemplatesController : ControllerBase
             savedJob.TemplateId = templateId;
             savedJob.TemplateParameters = request.Parameters;
 
-            // Try to assign to an available agent immediately
-            var agent = await _agentService.AssignJobToAgentAsync(savedJob.Id, job.ApplicationPath);
-            if (agent != null)
-            {
-                await _jobService.AssignJobAsync(savedJob.Id, agent.Id.ToString());
-                _logger.LogInformation("Template job {JobId} immediately assigned to agent {AgentId}", 
-                    savedJob.Id, agent.Id);
-            }
+            // Send job to orchestrator via AMQP/Message Queue
+            await _messageQueueService.PublishJobAsync(savedJob);
+            
+            _logger.LogInformation("Job {JobId} sent to orchestrator via message queue", savedJob.Id);
 
             var response = JobResponse.FromJob(savedJob);
             return CreatedAtAction(nameof(GetExecutionResult), new { jobId = savedJob.Id }, 

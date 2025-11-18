@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IJobQueueService, JobQueueService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IAutomationTemplateService, AutomationTemplateService>();
+builder.Services.AddScoped<IMessageQueueService, MessageQueueService>();
 
 // Add CORS
 builder.Services.AddCors(options =>

@@ -1,9 +1,13 @@
 using RPA.Orchestrator;
 using RPA.Orchestrator.Services;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// Configure services
+// Add services to the container
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+// Configure background worker services
 builder.Services.AddHostedService<Worker>();
 
 // Add orchestrator services
@@ -11,6 +15,8 @@ builder.Services.AddSingleton<ISessionManager, SessionManager>();
 builder.Services.AddSingleton<IAgentManager, AgentManager>();
 builder.Services.AddSingleton<IJobScheduler, JobScheduler>();
 builder.Services.AddSingleton<IHealthMonitor, HealthMonitor>();
+builder.Services.AddSingleton<IAgentCommunicationService, AgentCommunicationService>();
+builder.Services.AddHttpClient<IAgentCommunicationService, AgentCommunicationService>();
 
 // Configure logging
 builder.Logging.AddConsole();
@@ -21,9 +27,20 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 builder.Configuration.AddEnvironmentVariables();
 
-var host = builder.Build();
+var app = builder.Build();
 
-var logger = host.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation("Strategic RPA Orchestrator initializing...");
+// Configure the HTTP request pipeline
+app.UseHttpsRedirection();
+app.UseAuthorization();
 
-await host.RunAsync();
+// Map controllers
+app.MapControllers();
+
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Service = "RPA.Orchestrator", Timestamp = DateTime.UtcNow }))
+   .WithName("OrchestratorHealthCheck");
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Strategic RPA Orchestrator (API + Worker) starting on port 5001...");
+
+app.Run("http://localhost:5001");
