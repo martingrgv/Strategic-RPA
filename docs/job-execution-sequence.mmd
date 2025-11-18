@@ -1,0 +1,70 @@
+sequenceDiagram
+    participant Client as API Client
+    participant API as REST API
+    participant Queue as Job Queue
+    participant Scheduler as Job Scheduler
+    participant SessionMgr as Session Manager
+    participant Agent as Agent Worker
+    participant FlaUI as FlaUI Engine
+    participant App as Target Application
+    participant DB as Database
+    participant Storage as File Storage
+
+    Client->>API: POST /api/automation/jobs<br/>{ApplicationPath, Steps, Priority}
+    API->>DB: Store Job<br/>Status: Queued
+    API->>Queue: Enqueue Job
+    API-->>Client: 200 OK<br/>{JobId, Status: "Queued"}
+
+    Queue->>Scheduler: Job Available
+    Scheduler->>SessionMgr: Request Available Session
+    
+    alt Session Available
+        SessionMgr-->>Scheduler: Session ID: RDP-Session-3<br/>Agent: AutoAgent03
+    else No Session Available
+        SessionMgr->>SessionMgr: Create New RDP Session
+        SessionMgr->>Agent: Start Agent Process<br/>in New Session
+        SessionMgr-->>Scheduler: New Session Created
+    end
+
+    Scheduler->>Queue: Assign Job to Session
+    Queue->>Agent: Dispatch Job<br/>{JobId, ApplicationPath, Steps}
+    Agent->>DB: Update Status: Running
+
+    Agent->>FlaUI: Initialize Automation<br/>new UIA3Automation()
+    Agent->>App: Launch Application<br/>Application.Launch(path)
+    App-->>Agent: Process Started
+    
+    Agent->>FlaUI: GetMainWindow()
+    FlaUI->>App: Query UI Elements
+    App-->>FlaUI: Window Handle
+
+    loop For Each Step
+        Agent->>FlaUI: Execute Step<br/>(Click, Type, Wait)
+        FlaUI->>App: Perform UI Action
+        App-->>FlaUI: Action Result
+        FlaUI-->>Agent: Step Completed
+        Agent->>DB: Update Progress
+    end
+
+    Agent->>FlaUI: Capture Screenshot
+    FlaUI-->>Agent: Screenshot Data
+    Agent->>Storage: Save Screenshot<br/>Save Logs
+
+    Agent->>App: Close Application
+    App-->>Agent: Application Closed
+
+    Agent->>DB: Update Status: Success<br/>EndTime, Duration
+    Agent->>Queue: Report Completion
+    Queue->>SessionMgr: Mark Session Available
+
+    alt Session Jobs > Threshold
+        SessionMgr->>Agent: Terminate Session
+        SessionMgr->>SessionMgr: Create Fresh Session
+    else Session Reusable
+        SessionMgr->>SessionMgr: Reset Session State<br/>Mark Available
+    end
+
+    Client->>API: GET /api/automation/jobs/{JobId}
+    API->>DB: Query Job Status
+    DB-->>API: Job Result
+    API-->>Client: 200 OK<br/>{Status: "Success", Duration, Screenshot}

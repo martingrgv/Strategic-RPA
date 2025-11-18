@@ -1,0 +1,97 @@
+flowchart TB
+    Start([User Submits Job]) --> Validate{Validate<br/>Request}
+    
+    Validate -->|Invalid| Error1[Return 400<br/>Bad Request]
+    Validate -->|Valid| CreateJob[Create Job Record<br/>Status: Pending]
+    
+    CreateJob --> SaveDB1[(Save to Database)]
+    SaveDB1 --> Enqueue[Add to Job Queue<br/>Priority-based]
+    
+    Enqueue --> CheckSession{Available<br/>Session?}
+    
+    CheckSession -->|No| CreateSession[Create New RDP Session<br/>Windows User + Desktop]
+    CheckSession -->|Yes| GetSession[Get Available Session]
+    
+    CreateSession --> StartAgent[Start Agent Process<br/>in Session]
+    StartAgent --> SessionReady[Session Ready]
+    
+    GetSession --> SessionReady
+    SessionReady --> AssignJob[Assign Job to Agent]
+    
+    AssignJob --> UpdateDB1[(Update Status:<br/>Assigned)]
+    UpdateDB1 --> AgentReceive[Agent Receives Job]
+    
+    AgentReceive --> UpdateDB2[(Update Status:<br/>Running)]
+    UpdateDB2 --> LaunchApp[Launch Target Application]
+    
+    LaunchApp --> InitFlaUI[Initialize FlaUI<br/>UIA3Automation]
+    InitFlaUI --> GetWindow[Get Main Window]
+    
+    GetWindow --> ExecuteSteps[Execute Automation Steps]
+    
+    ExecuteSteps --> Step1{Step Type?}
+    
+    Step1 -->|Click| ClickAction[Find Element<br/>Invoke Click]
+    Step1 -->|Type| TypeAction[Find TextBox<br/>Enter Text]
+    Step1 -->|Wait| WaitAction[Delay Execution]
+    Step1 -->|Validate| ValidateAction[Assert Condition]
+    
+    ClickAction --> StepDone{More<br/>Steps?}
+    TypeAction --> StepDone
+    WaitAction --> StepDone
+    ValidateAction --> StepDone
+    
+    StepDone -->|Yes| LogProgress[Log Step Progress]
+    LogProgress --> ExecuteSteps
+    
+    StepDone -->|No| Capture[Capture Screenshot<br/>+ Logs]
+    
+    Capture --> SaveArtifacts[(Save to File Storage)]
+    SaveArtifacts --> CloseApp[Close Application]
+    
+    CloseApp --> JobResult{Job<br/>Success?}
+    
+    JobResult -->|Success| UpdateSuccess[(Update Status:<br/>Success<br/>Save Results)]
+    JobResult -->|Failure| UpdateFailure[(Update Status:<br/>Failed<br/>Save Error)]
+    
+    UpdateSuccess --> ReleaseSession[Release Session]
+    UpdateFailure --> ReleaseSession
+    
+    ReleaseSession --> CheckRecycle{Session<br/>Jobs > 50?}
+    
+    CheckRecycle -->|Yes| RecycleSession[Terminate Session<br/>Create New One]
+    CheckRecycle -->|No| ResetSession[Reset Session State<br/>Mark Available]
+    
+    RecycleSession --> NotifyComplete[Notify Job Complete]
+    ResetSession --> NotifyComplete
+    
+    NotifyComplete --> SendWebhook{Webhook<br/>Configured?}
+    
+    SendWebhook -->|Yes| CallWebhook[HTTP POST to<br/>Callback URL]
+    SendWebhook -->|No| End
+    
+    CallWebhook --> End([Job Complete])
+    Error1 --> End
+    
+    %% Parallel Monitoring Flow
+    AgentReceive -.Real-time.-> Metrics[(Prometheus<br/>Metrics)]
+    ExecuteSteps -.Real-time.-> Metrics
+    
+    AgentReceive -.Logs.-> LogStore[(ELK Stack<br/>Centralized Logs)]
+    ExecuteSteps -.Logs.-> LogStore
+    
+    Metrics --> Dashboard[Grafana<br/>Dashboard]
+    LogStore --> Dashboard
+    
+    %% Styling
+    classDef processStyle fill:#3498DB,stroke:#2874A6,stroke-width:2px,color:#fff
+    classDef decisionStyle fill:#F39C12,stroke:#D68910,stroke-width:3px,color:#fff
+    classDef dataStyle fill:#9B59B6,stroke:#7D3C98,stroke-width:2px,color:#fff
+    classDef errorStyle fill:#E74C3C,stroke:#CB4335,stroke-width:2px,color:#fff
+    classDef successStyle fill:#2ECC71,stroke:#27AE60,stroke-width:2px,color:#fff
+    
+    class CreateJob,Enqueue,CreateSession,StartAgent,LaunchApp,InitFlaUI,ExecuteSteps,Capture,CloseApp,ReleaseSession processStyle
+    class Validate,CheckSession,Step1,StepDone,JobResult,CheckRecycle,SendWebhook decisionStyle
+    class SaveDB1,UpdateDB1,UpdateDB2,SaveArtifacts,UpdateSuccess,UpdateFailure,Metrics,LogStore dataStyle
+    class Error1,UpdateFailure errorStyle
+    class UpdateSuccess,NotifyComplete successStyle

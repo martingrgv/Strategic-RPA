@@ -1,0 +1,160 @@
+graph TB
+    subgraph External["External Systems"]
+        CI[CI/CD Pipeline<br/>GitHub Actions/Jenkins]
+        API_Client[API Clients<br/>Test Management Tools]
+        WebUI[Web Dashboard<br/>Monitoring & Control]
+    end
+
+    subgraph LoadBalancer["Load Balancer / API Gateway"]
+        LB[NGINX / Azure API Gateway]
+    end
+
+    subgraph WindowsServer["Windows Server 2022 (Single Physical Server)"]
+        
+        subgraph Orchestrator["Orchestrator Layer"]
+            API[REST API Service<br/>ASP.NET Core]
+            Queue[Job Queue<br/>RabbitMQ/Azure Service Bus]
+            SessionMgr[Session Manager<br/>RDP Session Control]
+            HealthMon[Health Monitor<br/>Agent Status Tracking]
+            Scheduler[Job Scheduler<br/>Priority & Load Balancing]
+        end
+
+        subgraph Storage["Storage Layer"]
+            DB[(Database<br/>PostgreSQL/SQL Server<br/>Job Status & Results)]
+            FileStore[File Storage<br/>Screenshots & Logs<br/>Azure Blob/Local]
+            Cache[Redis Cache<br/>Session State]
+        end
+
+        subgraph Sessions["Isolated RDP Sessions"]
+            
+            subgraph Session1["RDP Session 1 - User: AutoAgent01"]
+                Agent1[Agent Worker 1<br/>.NET Service]
+                Desktop1[Virtual Desktop 1]
+                App1[Target Application<br/>Notepad/Calculator/Custom]
+                FlaUI1[FlaUI UIA3<br/>Automation Engine]
+                
+                Agent1 --> FlaUI1
+                FlaUI1 --> App1
+                App1 --> Desktop1
+            end
+
+            subgraph Session2["RDP Session 2 - User: AutoAgent02"]
+                Agent2[Agent Worker 2<br/>.NET Service]
+                Desktop2[Virtual Desktop 2]
+                App2[Target Application]
+                FlaUI2[FlaUI UIA3<br/>Automation Engine]
+                
+                Agent2 --> FlaUI2
+                FlaUI2 --> App2
+                App2 --> Desktop2
+            end
+
+            subgraph Session3["RDP Session 3 - User: AutoAgent03"]
+                Agent3[Agent Worker 3<br/>.NET Service]
+                Desktop3[Virtual Desktop 3]
+                App3[Target Application]
+                FlaUI3[FlaUI UIA3<br/>Automation Engine]
+                
+                Agent3 --> FlaUI3
+                FlaUI3 --> App3
+                App3 --> Desktop3
+            end
+
+            subgraph SessionN["RDP Session N - User: AutoAgentN"]
+                AgentN[Agent Worker N<br/>.NET Service]
+                DesktopN[Virtual Desktop N]
+                AppN[Target Application]
+                FlaUIN[FlaUI UIA3<br/>Automation Engine]
+                
+                AgentN --> FlaUIN
+                FlaUIN --> AppN
+                AppN --> DesktopN
+            end
+        end
+
+        subgraph Monitoring["Monitoring & Logging"]
+            Logger[Centralized Logging<br/>Serilog/ELK Stack]
+            Metrics[Metrics Collection<br/>Prometheus]
+            Alerts[Alert Manager<br/>Email/Slack/Teams]
+        end
+    end
+
+    subgraph Analytics["Analytics & Reporting"]
+        Grafana[Grafana Dashboard<br/>Real-time Metrics]
+        Reports[Report Generator<br/>Test Results & Trends]
+    end
+
+    %% External to Load Balancer
+    CI --> LB
+    API_Client --> LB
+    WebUI --> LB
+
+    %% Load Balancer to Orchestrator
+    LB --> API
+
+    %% Orchestrator Internal Connections
+    API --> Queue
+    API --> DB
+    Queue --> Scheduler
+    Scheduler --> SessionMgr
+    SessionMgr --> HealthMon
+    HealthMon --> Cache
+
+    %% Session Manager to Agents
+    SessionMgr -.Create/Manage.-> Agent1
+    SessionMgr -.Create/Manage.-> Agent2
+    SessionMgr -.Create/Manage.-> Agent3
+    SessionMgr -.Create/Manage.-> AgentN
+
+    %% Queue to Agents
+    Queue -.Dispatch Jobs.-> Agent1
+    Queue -.Dispatch Jobs.-> Agent2
+    Queue -.Dispatch Jobs.-> Agent3
+    Queue -.Dispatch Jobs.-> AgentN
+
+    %% Agents to Storage
+    Agent1 --> DB
+    Agent2 --> DB
+    Agent3 --> DB
+    AgentN --> DB
+
+    Agent1 --> FileStore
+    Agent2 --> FileStore
+    Agent3 --> FileStore
+    AgentN --> FileStore
+
+    %% Monitoring Connections
+    API --> Logger
+    Agent1 --> Logger
+    Agent2 --> Logger
+    Agent3 --> Logger
+    AgentN --> Logger
+
+    Scheduler --> Metrics
+    HealthMon --> Metrics
+    Agent1 --> Metrics
+    Agent2 --> Metrics
+    Agent3 --> Metrics
+    AgentN --> Metrics
+
+    Metrics --> Alerts
+
+    %% Analytics
+    DB --> Reports
+    Metrics --> Grafana
+    Logger --> Grafana
+
+    %% Styling
+    classDef orchestratorStyle fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
+    classDef sessionStyle fill:#50C878,stroke:#2E7D4E,stroke-width:2px,color:#fff
+    classDef storageStyle fill:#F39C12,stroke:#C87F0A,stroke-width:2px,color:#fff
+    classDef monitoringStyle fill:#9B59B6,stroke:#6C3483,stroke-width:2px,color:#fff
+    classDef externalStyle fill:#E74C3C,stroke:#C0392B,stroke-width:2px,color:#fff
+    classDef agentStyle fill:#1ABC9C,stroke:#16A085,stroke-width:2px,color:#fff
+
+    class API,Queue,SessionMgr,HealthMon,Scheduler orchestratorStyle
+    class Agent1,Agent2,Agent3,AgentN,FlaUI1,FlaUI2,FlaUI3,FlaUIN agentStyle
+    class Session1,Session2,Session3,SessionN sessionStyle
+    class DB,FileStore,Cache storageStyle
+    class Logger,Metrics,Alerts monitoringStyle
+    class CI,API_Client,WebUI,Grafana,Reports externalStyle

@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "bdPtlqNnbNWSJZLc4DZkXQVPKy06THezDXAHE6+DCsk=",
+  "Source": "RPA.API",
+  "BasePath": "_content/RPA.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RPA.API</name>
+    </assembly>
+    <members>
+        <member name="M:RPA.API.Controllers.AgentsController.CreateAgent(RPA.API.Requests.CreateAgentRequest)">
+            <summary>
+            Create a new automation agent
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.GetAgents">
+            <summary>
+            Get all agents
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.GetAgent(System.Guid)">
+            <summary>
+            Get agent by ID
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.GetAvailableAgents">
+            <summary>
+            Get available agents (idle status)
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.UpdateAgentStatus(System.Guid,RPA.API.Requests.UpdateAgentStatusRequest)">
+            <summary>
+            Update agent status
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.SendHeartbeat(System.Guid)">
+            <summary>
+            Send heartbeat for agent
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.DeleteAgent(System.Guid)">
+            <summary>
+            Delete agent
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.AgentsController.ReleaseAgent(System.Guid)">
+            <summary>
+            Release agent from current job
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.JobsController.CreateJob(RPA.API.Requests.CreateJobRequest)">
+            <summary>
+            Create a new automation job
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.JobsController.GetJob(System.Guid)">
+            <summary>
+            Get job by ID
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.JobsController.GetJobs(System.Nullable{RPA.API.Models.JobStatus},System.Int32,System.Int32)">
+            <summary>
+            Get jobs with optional filtering
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.JobsController.UpdateJobStatus(System.Guid,RPA.API.Controllers.UpdateJobStatusRequest)">
+            <summary>
+            Update job status (typically called by agents)
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.JobsController.AddScreenshot(System.Guid,RPA.API.Controllers.AddScreenshotRequest)">
+            <summary>
+            Add screenshot to job
+            </summary>
+        </member>
+        <member name="M:RPA.API.Controllers.JobsController.CancelJob(System.Guid)">
+            <summary>
+            Cancel job
+            </summary>
+        </member>
+    </members>
+</doc>

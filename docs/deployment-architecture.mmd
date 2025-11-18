@@ -1,0 +1,127 @@
+graph TB
+    subgraph Internet["Internet"]
+        Users[Users/Clients]
+    end
+
+    subgraph AzureCloud["Azure Cloud (Optional)"]
+        APIM[API Management]
+        KeyVault[Key Vault<br/>Credentials & Secrets]
+        AppInsights[Application Insights<br/>Telemetry]
+        BlobStorage[Blob Storage<br/>Screenshots & Artifacts]
+        ServiceBus[Service Bus<br/>Job Queue]
+    end
+
+    subgraph OnPremises["On-Premises Data Center"]
+        
+        subgraph DMZ["DMZ Zone"]
+            FW[Firewall]
+            NGINX[NGINX<br/>Reverse Proxy]
+        end
+
+        subgraph AppTier["Application Tier"]
+            subgraph Server1["Windows Server 2022 - Primary"]
+                Orchestrator1[Orchestrator Service<br/>Port: 5000]
+                API1[REST API<br/>Port: 5001]
+                SessionMgr1[Session Manager]
+                
+                subgraph RDSPool1["RDP Session Pool 1"]
+                    RDP1_1[Session 1-10<br/>Active Agents]
+                end
+            end
+
+            subgraph Server2["Windows Server 2022 - Secondary"]
+                Orchestrator2[Orchestrator Service<br/>Port: 5000]
+                API2[REST API<br/>Port: 5001]
+                SessionMgr2[Session Manager]
+                
+                subgraph RDSPool2["RDP Session Pool 2"]
+                    RDP2_1[Session 11-20<br/>Active Agents]
+                end
+            end
+        end
+
+        subgraph DataTier["Data Tier"]
+            subgraph DBCluster["Database Cluster"]
+                PrimaryDB[(SQL Server<br/>Primary)]
+                ReplicaDB[(SQL Server<br/>Read Replica)]
+            end
+            
+            Redis[Redis Cluster<br/>Session Cache]
+            
+            subgraph FileServer["File Server"]
+                NAS[NAS Storage<br/>Screenshots & Logs]
+            end
+        end
+
+        subgraph MonitoringTier["Monitoring Tier"]
+            Prometheus[Prometheus<br/>Metrics Collector]
+            Grafana[Grafana<br/>Dashboards]
+            ELK[ELK Stack<br/>Log Aggregation]
+        end
+    end
+
+    %% Internet Connections
+    Users --> FW
+    FW --> NGINX
+
+    %% DMZ to App Tier
+    NGINX --> API1
+    NGINX --> API2
+
+    %% App Tier to Azure (if hybrid)
+    API1 -.Optional.-> APIM
+    API2 -.Optional.-> APIM
+    
+    Orchestrator1 -.Optional.-> ServiceBus
+    Orchestrator2 -.Optional.-> ServiceBus
+    
+    SessionMgr1 -.Optional.-> KeyVault
+    SessionMgr2 -.Optional.-> KeyVault
+    
+    API1 -.Optional.-> AppInsights
+    API2 -.Optional.-> AppInsights
+    
+    RDSPool1 -.Optional.-> BlobStorage
+    RDSPool2 -.Optional.-> BlobStorage
+
+    %% App Tier to Data Tier
+    Orchestrator1 --> PrimaryDB
+    Orchestrator2 --> PrimaryDB
+    API1 --> ReplicaDB
+    API2 --> ReplicaDB
+    
+    SessionMgr1 --> Redis
+    SessionMgr2 --> Redis
+    
+    RDSPool1 --> NAS
+    RDSPool2 --> NAS
+
+    %% Monitoring Connections
+    Orchestrator1 --> Prometheus
+    Orchestrator2 --> Prometheus
+    RDSPool1 --> Prometheus
+    RDSPool2 --> Prometheus
+    
+    Orchestrator1 --> ELK
+    Orchestrator2 --> ELK
+    RDSPool1 --> ELK
+    RDSPool2 --> ELK
+    
+    Prometheus --> Grafana
+    ELK --> Grafana
+
+    %% Database Replication
+    PrimaryDB -.Replication.-> ReplicaDB
+
+    %% Styling
+    classDef azureStyle fill:#0078D4,stroke:#005A9E,stroke-width:2px,color:#fff
+    classDef serverStyle fill:#50C878,stroke:#2E7D4E,stroke-width:2px,color:#fff
+    classDef dataStyle fill:#F39C12,stroke:#C87F0A,stroke-width:2px,color:#fff
+    classDef monitorStyle fill:#9B59B6,stroke:#6C3483,stroke-width:2px,color:#fff
+    classDef securityStyle fill:#E74C3C,stroke:#C0392B,stroke-width:2px,color:#fff
+
+    class APIM,KeyVault,AppInsights,BlobStorage,ServiceBus azureStyle
+    class Orchestrator1,Orchestrator2,API1,API2,SessionMgr1,SessionMgr2,RDSPool1,RDSPool2 serverStyle
+    class PrimaryDB,ReplicaDB,Redis,NAS dataStyle
+    class Prometheus,Grafana,ELK monitorStyle
+    class FW,NGINX securityStyle

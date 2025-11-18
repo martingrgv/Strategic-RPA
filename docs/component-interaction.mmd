@@ -1,0 +1,97 @@
+graph LR
+    subgraph Client["Client Applications"]
+        WebApp[Web Dashboard]
+        CLI[CLI Tool]
+        CICD[CI/CD Pipeline]
+    end
+
+    subgraph APILayer["API Layer"]
+        AuthN[Authentication<br/>JWT/OAuth]
+        RateLimiter[Rate Limiter<br/>Throttling]
+        APIGateway[API Gateway<br/>Routing]
+    end
+
+    subgraph CoreServices["Core Services"]
+        JobService[Job Service<br/>CRUD Operations]
+        QueueService[Queue Service<br/>Job Distribution]
+        SessionService[Session Service<br/>Lifecycle Management]
+        ResultService[Result Service<br/>Aggregation]
+    end
+
+    subgraph Infrastructure["Infrastructure Services"]
+        UserMgmt[User Management<br/>Windows Users]
+        RDPMgmt[RDP Management<br/>Session Control]
+        ProcessMgmt[Process Management<br/>Agent Lifecycle]
+        ResourceMgmt[Resource Management<br/>CPU/Memory Monitor]
+    end
+
+    subgraph Agents["Agent Layer"]
+        AgentComm[Agent Communication<br/>gRPC/SignalR]
+        JobExecutor[Job Executor<br/>FlaUI Wrapper]
+        ScreenCapture[Screen Capture<br/>Screenshot/Video]
+        ErrorHandler[Error Handler<br/>Retry Logic]
+    end
+
+    subgraph DataServices["Data Services"]
+        JobRepo[Job Repository<br/>EF Core]
+        ResultRepo[Result Repository<br/>EF Core]
+        CacheService[Cache Service<br/>Redis Client]
+        FileService[File Service<br/>Blob/NAS]
+    end
+
+    %% Client to API
+    WebApp --> AuthN
+    CLI --> AuthN
+    CICD --> AuthN
+    
+    AuthN --> RateLimiter
+    RateLimiter --> APIGateway
+
+    %% API to Core Services
+    APIGateway --> JobService
+    APIGateway --> ResultService
+
+    %% Core Services Interactions
+    JobService --> QueueService
+    JobService --> JobRepo
+    
+    QueueService --> SessionService
+    SessionService --> RDPMgmt
+    SessionService --> CacheService
+    
+    ResultService --> ResultRepo
+    ResultService --> FileService
+
+    %% Infrastructure
+    RDPMgmt --> UserMgmt
+    RDPMgmt --> ProcessMgmt
+    ProcessMgmt --> ResourceMgmt
+
+    %% Session to Agent
+    SessionService -.Start/Stop.-> AgentComm
+    QueueService -.Dispatch.-> AgentComm
+
+    %% Agent Internal
+    AgentComm --> JobExecutor
+    JobExecutor --> ScreenCapture
+    JobExecutor --> ErrorHandler
+    
+    %% Agent to Data
+    JobExecutor --> ResultRepo
+    ScreenCapture --> FileService
+    ErrorHandler --> JobRepo
+
+    %% Styling
+    classDef clientStyle fill:#3498DB,stroke:#2874A6,stroke-width:2px,color:#fff
+    classDef apiStyle fill:#1ABC9C,stroke:#16A085,stroke-width:2px,color:#fff
+    classDef coreStyle fill:#F39C12,stroke:#D68910,stroke-width:2px,color:#fff
+    classDef infraStyle fill:#9B59B6,stroke:#7D3C98,stroke-width:2px,color:#fff
+    classDef agentStyle fill:#E74C3C,stroke:#CB4335,stroke-width:2px,color:#fff
+    classDef dataStyle fill:#95A5A6,stroke:#7F8C8D,stroke-width:2px,color:#fff
+
+    class WebApp,CLI,CICD clientStyle
+    class AuthN,RateLimiter,APIGateway apiStyle
+    class JobService,QueueService,SessionService,ResultService coreStyle
+    class UserMgmt,RDPMgmt,ProcessMgmt,ResourceMgmt infraStyle
+    class AgentComm,JobExecutor,ScreenCapture,ErrorHandler agentStyle
+    class JobRepo,ResultRepo,CacheService,FileService dataStyle
