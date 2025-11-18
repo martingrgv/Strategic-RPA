@@ -19,6 +19,7 @@ builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IJobQueueService, JobQueueService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IAutomationTemplateService, AutomationTemplateService>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -45,4 +46,4 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
    .WithName("HealthCheck");
 
-app.Run();
+app.Run("http://localhost:5000");

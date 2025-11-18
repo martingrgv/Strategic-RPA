@@ -17,6 +17,11 @@ public class AutomationJob
     public string? ErrorMessage { get; set; }
     public List<string> Screenshots { get; set; } = new();
     public string? WebhookUrl { get; set; }
+    
+    // Template-related properties
+    public string? TemplateId { get; set; }
+    public Dictionary<string, object>? TemplateParameters { get; set; }
+    
     public TimeSpan? Duration => CompletedAt.HasValue && StartedAt.HasValue 
         ? CompletedAt.Value - StartedAt.Value 
         : null;

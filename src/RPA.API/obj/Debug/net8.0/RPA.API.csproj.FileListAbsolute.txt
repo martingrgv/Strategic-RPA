@@ -45,3 +45,4 @@
 /home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.API/obj/Debug/net8.0/RPA.API.pdb
 /home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.API/obj/Debug/net8.0/RPA.API.genruntimeconfig.cache
 /home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.API/obj/Debug/net8.0/ref/RPA.API.dll
+/home/martinwlsngrgv/development/projects/strategic-rpa/src/RPA.API/obj/Debug/net8.0/RPA.API.sourcelink.json
